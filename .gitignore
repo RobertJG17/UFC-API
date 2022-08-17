@@ -1,9 +1,11 @@
 *__pycache__
-*DS_Store
+.DS_Store
 .env
 *.ipynb
 *.ipynb_checkpoints
 service_acct.json
 fighters_scrape.py
 stats_scrape.py
-env/
+env
+logs
+plugins
