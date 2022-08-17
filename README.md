@@ -6,7 +6,7 @@ Welcome to my first attempt at a Data Engineering based project! I recently shif
 
 Here is a high level overview of the project I provisioned with [Diagrams](https://diagrams.mingrammer.com/), a python library that utilizes a code based interface for creating architecture diagrams.
 
-# INCLUDE PNG HERE
+![Project Overview](https://github.com/RobertJG17/UFC-API/blob/main/architecture/project_architecture.png)
 
 
 
