@@ -1,12 +1,18 @@
+from os.path import join, dirname
 from GCSClient import GCSClient
+from dotenv import load_dotenv
 from pgconfig import getconn
 import sqlalchemy
 
-# SCRIPT FOR DATA LOAD | UPDATES
+# LOAD ENV FILE
+dotenv_path = join(dirname('../__file__'), '.env')
+load_dotenv(dotenv_path)
 
-gcs_client = GCSClient()
-blob = gcs_client.fetch_from_bucket('curated/curated.parquet')
-df = gcs_client.create_df_from_blob(blob)
+# SCRIPT FOR DATA LOAD | UPDATES
+curated_blob_path = os.environ.get('MERGE_GCS_PATH')
+gcs_curated_client = GCSClient(blob_path=curated_blob_path)
+blob = gcs_curated_client.fetch_from_bucket()
+df = gcs_curated_client.create_df_from_blob(blob)
 
 conn = sqlalchemy.create_engine(
     "postgresql+pg8000://",
