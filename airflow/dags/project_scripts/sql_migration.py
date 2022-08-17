@@ -3,6 +3,7 @@ from GCSClient import GCSClient
 from dotenv import load_dotenv
 from pgconfig import getconn
 import sqlalchemy
+import os
 
 # LOAD ENV FILE
 dotenv_path = join(dirname('../__file__'), '.env')

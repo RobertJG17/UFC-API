@@ -4,8 +4,7 @@
 *.ipynb
 *.ipynb_checkpoints
 service_acct.json
-fighters_scrape.py
-stats_scrape.py
+helpers
 env
 logs
 plugins

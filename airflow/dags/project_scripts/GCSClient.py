@@ -9,13 +9,13 @@ import os
 
 
 class GCSClient:
-    SERVICE_ACCT_CREDENTIALS = service_account.Credentials.from_service_account_file('../service_acct.json')
+    SERVICE_ACCT_CREDENTIALS = service_account.Credentials.from_service_account_file('./service_acct.json')
     bucket_name = None
 
     def __init__(self, blob_path):
         self.blob_path = blob_path 
         if self.bucket_name is None:
-            dotenv_path = join(dirname('../__file__'), '.env')
+            dotenv_path = join(dirname('./__file__'), '.env')
             load_dotenv(dotenv_path)
             self.bucket_name = os.environ.get('UFC_BUCKET')
 
