@@ -1,7 +1,5 @@
-from os.path import join, dirname
-from GCSClient import GCSClient
-from dotenv import load_dotenv
-from io import BytesIO
+from dotenv import load_dotenv, find_dotenv
+from helpers.GCSClient import GCSClient
 from time import time
 import pandas as pd
 import os
@@ -54,9 +52,6 @@ def clean(df: pd.DataFrame):
 
 # ENTRY POINT FOR DAG REFERENCE
 def data_merge_entrypoint():
-    dotenv_path = join(dirname('../__file__'), '.env')
-    load_dotenv(dotenv_path)
-
     start = time()
 
     # FETCH FIGHTERS.PARQUET AND LOAD INTO DF
@@ -82,9 +77,12 @@ def data_merge_entrypoint():
     gcs_curated_client.upload_to_bucket(curated_file)
 
     end = time()
-
     print(f"Script took {end - start} seconds to complete")
 
 
 if __name__ == "__main__":
+    # LOAD .ENV TO ACCESS SENSITIVE DATA
+    load_dotenv(find_dotenv())
+
+    # RUN SCRIPT
     data_merge_entrypoint()

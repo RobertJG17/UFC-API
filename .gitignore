@@ -4,7 +4,8 @@
 *.ipynb
 *.ipynb_checkpoints
 service_acct.json
-helpers
 env
 logs
 plugins
+parsers
+

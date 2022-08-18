@@ -1,23 +1,24 @@
+from dotenv import find_dotenv, load_dotenv
 from google.oauth2 import service_account
-from os.path import join, dirname
 # Imports the Google Cloud client library
 from google.cloud import storage
-from dotenv import load_dotenv
 from io import BytesIO
 import pandas as pd
+import json
 import os
 
 
 class GCSClient:
-    SERVICE_ACCT_CREDENTIALS = service_account.Credentials.from_service_account_file('./service_acct.json')
+    SERVICE_ACCT_CREDENTIALS = None
     bucket_name = None
 
     def __init__(self, blob_path):
         self.blob_path = blob_path 
         if self.bucket_name is None:
-            dotenv_path = join(dirname('./__file__'), '.env')
-            load_dotenv(dotenv_path)
+            load_dotenv(find_dotenv())
             self.bucket_name = os.environ.get('UFC_BUCKET')
+            creds = json.loads(os.environ.get('SERVICE_ACCT_JSON'))
+            self.SERVICE_ACCT_CREDENTIALS = service_account.Credentials.from_service_account_info(creds) 
 
     def upload_to_bucket(self, contents):
         bucket = storage.Client(credentials=self.SERVICE_ACCT_CREDENTIALS).bucket(self.bucket_name)

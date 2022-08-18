@@ -1,8 +1,7 @@
-from helpers.stats_parser_funcs import parse_soup
+from helpers.parsers.stats_parser_funcs import parse_soup
 from aiohttp import ClientSession, TCPConnector
-from os.path import join, dirname
-from GCSClient import GCSClient
-from dotenv import load_dotenv
+from dotenv import load_dotenv, find_dotenv
+from helpers.GCSClient import GCSClient
 from bs4 import BeautifulSoup
 from time import time
 import pandas as pd
@@ -58,13 +57,8 @@ async def main():
           
 # ENTRY POINT FOR DAG REFERENCE
 def stats_entrypoint():
-     # LOAD .ENV TO ACCESS SENSITIVE DATA
-     dotenv_path = join(dirname('./__file__'), '.env')
-     load_dotenv(dotenv_path)
-
      start = time()
      records = asyncio.run(main())
-     end = time()
 
      df = pd.DataFrame.from_records(records)
      parquet_file = df.to_parquet(engine='pyarrow')
@@ -74,8 +68,13 @@ def stats_entrypoint():
      gcs_stats_client = GCSClient(blob_path=stats_blob_path)
      gcs_stats_client.upload_to_bucket(parquet_file)
 
+     end = time()
      print('Script took {} seconds to complete'.format(end-start))
     
 
 if __name__ == "__main__":
+     # LOAD .ENV TO ACCESS SENSITIVE DATA
+     load_dotenv(find_dotenv())
+
+     # RUN SCRIPT
      stats_entrypoint()

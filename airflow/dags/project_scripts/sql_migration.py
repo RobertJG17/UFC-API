@@ -1,13 +1,11 @@
-from os.path import join, dirname
-from GCSClient import GCSClient
-from dotenv import load_dotenv
-from pgconfig import getconn
+from dotenv import load_dotenv, find_dotenv
+from helpers.GCSClient import GCSClient
+from helpers.pgconfig import getconn
 import sqlalchemy
 import os
 
 # LOAD ENV FILE
-dotenv_path = join(dirname('../__file__'), '.env')
-load_dotenv(dotenv_path)
+load_dotenv(find_dotenv())
 
 # SCRIPT FOR DATA LOAD | UPDATES
 curated_blob_path = os.environ.get('MERGE_GCS_PATH')
