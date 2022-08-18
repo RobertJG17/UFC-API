@@ -1,7 +1,7 @@
 from airflow.models import DAG
 from airflow.operators.python import PythonOperator, PythonVirtualenvOperator
 from airflow.utils.dates import days_ago
-from project_scripts import fighters_scrape, stats_scrape, data_merge
+from scripts import fighters_scrape, stats_scrape, data_merge
 
 
 args = {
