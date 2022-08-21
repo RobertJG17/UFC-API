@@ -1,25 +1,36 @@
 from dotenv import load_dotenv, find_dotenv
-from helpers.GCSClient import GCSClient
+from ufc_proj.common.utils.GCSClient import GCSClient
 from time import time
 import pandas as pd
 import os
 
 
 def clean(df: pd.DataFrame):
-    col_mapping = {
-        'Sig. Str. Landed': 'ss-landed-pm', 'Sig. Str. Absorbed': 'ss-absorbed-pm',
-        'Takedown avg': 'tkd-avg', 'Submission avg': 'sub-avg', 'Sig. Str. Defense': 'ss-def', 'Takedown Defense': 'tkd-def',
-        'Knockdown Ratio': 'knockdown-ratio', 'Height': 'height', 'Weight': 'weight', 'Reach': 'reach', 'Leg reach': 'leg-reach', 
-        'Title Defenses': 'title-defenses', 'Fight Win Streak': 'fight-win-streak', 'Sig. Strikes Attempted': 'ss-attempted', 
-        'Sig. Strikes Landed': 'ss-landed', 'Standing': 'standing', 'Clinch' : 'clinch', 'Ground': 'ground', 'KO/TKO': 'ko-tko', 
-        'DEC': 'dec', 'SUB': 'sub', 'Age': 'age', 'Takedowns Landed': 'tkd-landed', 'Takedowns Attempted': 'tkd-attempted', 
-        'img': 'href', 'nickName': 'nick-name', 'weightClass': 'weight-class', 'Fighter': 'fighter', 'Former Champion': 'former-champion',
-        'Average fight time': 'avg-fight-time', 'Status': 'status', 'Hometown': 'hometown', 'Octagon Debut': 'oct-debut',
-        'Trains at': 'trains-at', 'Fighting style': 'style', 'First Round Finishes': 'first-round-finishes'
-    }
+    old_cols = df.columns
+    standarized_cols = [
+        col.lower().replace(' ', '-').replace('.', '').replace('/', '-')
+        for col in df.columns
+    ]
 
-    df = df.rename(col_mapping, axis=1)
-    df = df.drop(['Wins by Decision', 'Wins by Knockout', 'Wins by Submission'], axis=1)
+    new_col_dict = {old_cols[idx]: standarized_cols[idx] for idx in range(len(df.columns))}
+
+    # APPENDING PM TO METRICS MEASURED PER MINUTE
+    df = df.rename(new_col_dict, axis=1)
+    df = df.rename({
+        'sig-str-landed': 'sig-str-landed-pm', 
+        'sig-str-absorbed': 'sig-str-absorbed-pm'}, 
+    axis=1)
+    
+    print(df.columns)
+    for col in df.columns:
+        print(col)
+
+        df[:, col].where()
+
+        exit()
+
+
+    # df = df.drop(['Wins by Decision', 'Wins by Knockout', 'Wins by Submission'], axis=1)
 
     # CHANGING 
     # Sig. Strikes Attempted, Sig. Str. Landed, Sig. Str. Absorbed, Standing, Clinch, Ground, KO/TKO, DEC, SUB 
@@ -52,6 +63,9 @@ def clean(df: pd.DataFrame):
 
 # ENTRY POINT FOR DAG REFERENCE
 def data_merge_entrypoint():
+    # LOAD .ENV TO ACCESS SENSITIVE DATA
+    load_dotenv(find_dotenv())
+    
     start = time()
 
     # FETCH FIGHTERS.PARQUET AND LOAD INTO DF

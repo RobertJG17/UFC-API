@@ -1,7 +1,7 @@
-from helpers.parsers.fighters_parser_funcs import extract_info
+from ufc_proj.common.utils.parsers import extract_info
 from aiohttp import ClientSession, TCPConnector
 from dotenv import load_dotenv, find_dotenv
-from helpers.GCSClient import GCSClient
+from ufc_proj.common.utils.GCSClient import GCSClient
 from bs4 import BeautifulSoup
 from itertools import chain
 from time import time
@@ -56,6 +56,9 @@ async def main():
 
 # ENTRY POINT FOR DAG REFERENCE
 def fighters_entrypoint():
+    # LOAD .ENV TO ACCESS SENSITIVE DATA
+    load_dotenv(find_dotenv())
+
     start = time()
     pages = asyncio.run(main())
     # converting 2d list into 1d
@@ -75,9 +78,9 @@ def fighters_entrypoint():
     print('Script took {} seconds to complete'.format(end-start))
 
 
-if __name__ == "__main__":
-    # LOAD .ENV TO ACCESS SENSITIVE DATA
-    load_dotenv(find_dotenv())
+# if __name__ == "__main__":
+#     # LOAD .ENV TO ACCESS SENSITIVE DATA
+#     load_dotenv(find_dotenv())
 
-    # RUN SCRIPT
-    fighters_entrypoint()
+#     # RUN SCRIPT
+#     fighters_entrypoint()

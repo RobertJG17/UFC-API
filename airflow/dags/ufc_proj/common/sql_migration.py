@@ -1,6 +1,6 @@
 from dotenv import load_dotenv, find_dotenv
-from helpers.GCSClient import GCSClient
-from helpers.pgconfig import getconn
+from utils.GCSClient import GCSClient
+from utils.pgconfig import getconn
 import sqlalchemy
 import os
 

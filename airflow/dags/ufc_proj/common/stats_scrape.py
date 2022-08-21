@@ -1,7 +1,7 @@
-from helpers.parsers.stats_parser_funcs import parse_soup
+from ufc_proj.common.utils.parsers import parse_soup
 from aiohttp import ClientSession, TCPConnector
 from dotenv import load_dotenv, find_dotenv
-from helpers.GCSClient import GCSClient
+from ufc_proj.common.utils.GCSClient import GCSClient
 from bs4 import BeautifulSoup
 from time import time
 import pandas as pd
@@ -39,7 +39,6 @@ async def main():
 
      async with ClientSession(connector=TCPConnector(ssl=False)) as session:
           for idx in fighters_df.index:
-               print(fighters_df.loc[idx, 'name'])
                tasks.append(
                     fetch_with_sem(
                          base_url + fighters_df.loc[idx, "slug"], 
@@ -57,6 +56,9 @@ async def main():
           
 # ENTRY POINT FOR DAG REFERENCE
 def stats_entrypoint():
+     # LOAD .ENV TO ACCESS SENSITIVE DATA
+     load_dotenv(find_dotenv())
+     
      start = time()
      records = asyncio.run(main())
 
@@ -72,9 +74,9 @@ def stats_entrypoint():
      print('Script took {} seconds to complete'.format(end-start))
     
 
-if __name__ == "__main__":
-     # LOAD .ENV TO ACCESS SENSITIVE DATA
-     load_dotenv(find_dotenv())
+# if __name__ == "__main__":
+#      # LOAD .ENV TO ACCESS SENSITIVE DATA
+#      load_dotenv(find_dotenv())
 
-     # RUN SCRIPT
-     stats_entrypoint()
+#      # RUN SCRIPT
+#      stats_entrypoint()
