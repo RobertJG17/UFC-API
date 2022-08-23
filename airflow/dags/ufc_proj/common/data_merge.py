@@ -23,19 +23,23 @@ def clean(df: pd.DataFrame):
     axis=1)
     
     df = df.replace({'None': np.nan, None: np.nan, 'nan': np.nan})
-    non_null_entry = df.dropna(axis=0).iloc[0]
+    df = df.convert_dtypes()
+    non_null_entry = df.loc[df["fighter"] == "Charles Oliveira"]
+    non_null_entry = df.iloc[non_null_entry.index].reset_index(drop=True).squeeze()
 
-    print(non_null_entry)
-
+    print(df.dtypes)
+    
     # Iterate thru columns
     for val in non_null_entry:
         # check if val contains alphabetical characters with regexp
-        str_regexp = re.compile(r'[a-zA-Z]')
+        str_regexp = re.compile(r'\D|\s')
+        str_chars = [' ', '/', '-', ':']
+        str_val = str(val)
 
-        if str_regexp.match(str(val)):
+        if str_regexp.match(str_val) or any(char in str_val for char in str_chars):
             print(f'{val} is a string!')
-        elif float_regexp.match(str(val)):
-            print(f'{val} is a string!')
+        elif '.' in str(val):
+            print(f'{val} is a float!')
         else:
             print(f'{val} is an int!')
 
