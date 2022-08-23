@@ -21,13 +21,14 @@ with DAG(
         task_id='python_dag_task_1',
         python_callable=fighters_scrape.fighters_entrypoint, 
         dag=dag,
-        provide_context=True
+        retries=3
     )
 
     stats_scrape_task = PythonOperator(
         task_id='python_dag_task_2', 
         python_callable=stats_scrape.stats_entrypoint, 
-        dag=dag
+        dag=dag,
+        retries=3
     )
 
     data_merge_task = PythonOperator(
@@ -37,3 +38,10 @@ with DAG(
     )
 
     fighters_scrape_task >> stats_scrape_task >> data_merge_task
+
+
+# CMD TO BUILD AIRFLOW IMG FROM COMPOSE FILE
+# docker-compose up
+
+# CMD TO START ALL PREVIOUSLY STOPPED CONTAINERS
+# docker-compose start

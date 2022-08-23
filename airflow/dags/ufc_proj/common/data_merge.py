@@ -1,12 +1,13 @@
 from dotenv import load_dotenv, find_dotenv
-from ufc_proj.common.utils.GCSClient import GCSClient
+from utils.GCSClient import GCSClient
 from time import time
-import pandas as pd
-import os
+import pandas as pd, numpy as np
+import os, re
 
 
 def clean(df: pd.DataFrame):
     old_cols = df.columns
+
     standarized_cols = [
         col.lower().replace(' ', '-').replace('.', '').replace('/', '-')
         for col in df.columns
@@ -21,14 +22,28 @@ def clean(df: pd.DataFrame):
         'sig-str-absorbed': 'sig-str-absorbed-pm'}, 
     axis=1)
     
-    print(df.columns)
-    for col in df.columns:
-        print(col)
+    df = df.replace({'None': np.nan, None: np.nan, 'nan': np.nan})
+    non_null_entry = df.dropna(axis=0).iloc[0]
 
-        df[:, col].where()
+    print(non_null_entry)
 
-        exit()
+    # Iterate thru columns
+    for val in non_null_entry:
+        # check if val contains alphabetical characters with regexp
+        str_regexp = re.compile(r'[a-zA-Z]')
 
+        if str_regexp.match(str(val)):
+            print(f'{val} is a string!')
+        elif float_regexp.match(str(val)):
+            print(f'{val} is a string!')
+        else:
+            print(f'{val} is an int!')
+
+
+    # else try to cast to int, if it fails cast to str
+
+
+    exit()
 
     # df = df.drop(['Wins by Decision', 'Wins by Knockout', 'Wins by Submission'], axis=1)
 
