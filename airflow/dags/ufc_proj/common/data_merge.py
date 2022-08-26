@@ -1,3 +1,4 @@
+from curses import keyname
 from dotenv import load_dotenv, find_dotenv
 from utils.GCSClient import GCSClient
 from time import time
@@ -22,53 +23,30 @@ def clean(df: pd.DataFrame):
         'sig-str-absorbed': 'sig-str-absorbed-pm'}, 
     axis=1)
     
-    df = df.replace({'None': np.nan, None: np.nan, 'nan': np.nan})
-    df = df.convert_dtypes()
-    non_null_entry = df.loc[df["fighter"] == "Charles Oliveira"]
-    non_null_entry = df.iloc[non_null_entry.index].reset_index(drop=True).squeeze()
-
-    print(df.dtypes)
+    entry = df.loc[df["fighter"] == "Charles Oliveira"]
+    entry = df.iloc[entry.index].reset_index(drop=True).squeeze().to_dict()
     
     # Iterate thru columns
-    for val in non_null_entry:
+    modified_col_dtype = {}
+    for key, val in entry.items():
         # check if val contains alphabetical characters with regexp
-        str_regexp = re.compile(r'\D|\s')
-        str_chars = [' ', '/', '-', ':']
+        str_regexp = r'[a-zA-Z]|\s|-|:|/'
+        # str_chars = [' ', '/', '-', ':']
+        # or any(char in str_val for char in str_chars)
         str_val = str(val)
 
-        if str_regexp.match(str_val) or any(char in str_val for char in str_chars):
-            print(f'{val} is a string!')
-        elif '.' in str(val):
-            print(f'{val} is a float!')
+        if re.search(str_regexp, str_val):
+            df.loc[:, key] = df.loc[:, key].replace('', '-').replace(np.NaN, '-')
+            modified_col_dtype[key] = 'string'
+        elif '.' in str_val:
+            df.loc[:, key] = df.loc[:, key].replace('', -1).replace(np.NaN, -1)
+            modified_col_dtype[key] = 'float'
         else:
-            print(f'{val} is an int!')
+            df.loc[:, key] = df.loc[:, key].replace('', -1).replace(np.NaN, -1)
+            modified_col_dtype[key] = 'int'
 
+    df = df.astype(modified_col_dtype)
 
-    # else try to cast to int, if it fails cast to str
-
-
-    exit()
-
-    # df = df.drop(['Wins by Decision', 'Wins by Knockout', 'Wins by Submission'], axis=1)
-
-    # CHANGING 
-    # Sig. Strikes Attempted, Sig. Str. Landed, Sig. Str. Absorbed, Standing, Clinch, Ground, KO/TKO, DEC, SUB 
-    # TO INT
-    int_cols = [
-    "age", "fight-win-streak", "ss-landed", "ss-attempted", 
-    "standing", "clinch", "ground", "ko-tko", "dec", "sub",
-    "first-round-finishes"
-    ]
-    df.loc[:, int_cols] = df.loc[:, int_cols].fillna(0)
-    df.loc[:, int_cols] = df.loc[:, int_cols].astype(int)
-
-    float_cols = [
-    "height", "knockdown-ratio", "leg-reach", "reach", "ss-absorbed-pm", 
-    "ss-def", "ss-landed-pm", "sub-avg", "title-defenses",	"tkd-attempted", 
-    "tkd-avg",	"tkd-def", "tkd-landed"
-    ]
-    df.loc[:, float_cols] = df.loc[:, float_cols].fillna(0.0).replace('', 0.0)
-    df.loc[:, float_cols] = df.loc[:, float_cols].astype(float)
 
     # FILLING NA VALUES IN OBJECT OR STR COLUMNS WITH EMPTY STR
     cols = ['wins', 'losses', 'draws']
