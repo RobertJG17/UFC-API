@@ -7,13 +7,13 @@ import os, re
 
 
 def clean(df: pd.DataFrame):
+    
+    # STANDARDIZING COLUMNS
     old_cols = df.columns
-
     standarized_cols = [
         col.lower().replace(' ', '-').replace('.', '').replace('/', '-')
         for col in df.columns
     ]
-
     new_col_dict = {old_cols[idx]: standarized_cols[idx] for idx in range(len(df.columns))}
 
     # APPENDING PM TO METRICS MEASURED PER MINUTE
@@ -31,8 +31,6 @@ def clean(df: pd.DataFrame):
     for key, val in entry.items():
         # check if val contains alphabetical characters with regexp
         str_regexp = r'[a-zA-Z]|\s|-|:|/'
-        # str_chars = [' ', '/', '-', ':']
-        # or any(char in str_val for char in str_chars)
         str_val = str(val)
 
         if re.search(str_regexp, str_val):
@@ -46,7 +44,6 @@ def clean(df: pd.DataFrame):
             modified_col_dtype[key] = 'int'
 
     df = df.astype(modified_col_dtype)
-
 
     # FILLING NA VALUES IN OBJECT OR STR COLUMNS WITH EMPTY STR
     cols = ['wins', 'losses', 'draws']
