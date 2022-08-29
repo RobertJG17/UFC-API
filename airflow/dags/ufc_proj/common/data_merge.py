@@ -21,6 +21,7 @@ def clean(df: pd.DataFrame):
         'sig-str-absorbed': 'sig-str-absorbed-pm'}, 
     axis=1)
     
+    # DYNAMIC CAST USING NESTED TRY EXCEPT BLOCKS
     for col in df.columns:
         try:
             df.loc[:, col] = df.loc[:, col].replace('', -1).replace(np.NaN, -1)
@@ -30,7 +31,7 @@ def clean(df: pd.DataFrame):
                 df.loc[:, col] = df.loc[:, col].replace(-1, '')
                 df.loc[:, col] = df.loc[:, col].replace('', -1.0)
                 df.loc[:, col] = df.loc[:, col].astype('float')
-            except Exception as e:
+            except ValueError:
                 df.loc[:, col] = df.loc[:, col].replace(-1.0, '').replace(-1, '')
                 df.loc[:, col] = df.loc[:, col].replace('', '-')
                 df.loc[:, col] = df.loc[:, col].astype('str')
