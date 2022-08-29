@@ -1,5 +1,5 @@
 from dotenv import load_dotenv, find_dotenv
-from utils.GCSClient import GCSClient
+from ufc_proj.common.utils.GCSClient import GCSClient
 from time import time
 import pandas as pd, numpy as np
 import os, re
