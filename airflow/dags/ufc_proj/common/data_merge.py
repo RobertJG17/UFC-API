@@ -39,7 +39,7 @@ def clean(df: pd.DataFrame):
             df.loc[:, key] = df.loc[:, key].replace('', '-').replace(np.NaN, '-')
             modified_col_dtype[key] = 'string'
         elif '.' in str_val:
-            df.loc[:, key] = df.loc[:, key].replace('', -1).replace(np.NaN, -1)
+            df.loc[:, key] = df.loc[:, key].replace('', -1.0).replace(np.NaN, -1)
             modified_col_dtype[key] = 'float'
         else:
             df.loc[:, key] = df.loc[:, key].replace('', -1).replace(np.NaN, -1)
