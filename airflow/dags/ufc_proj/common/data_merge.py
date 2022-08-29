@@ -1,4 +1,3 @@
-from curses import keyname
 from dotenv import load_dotenv, find_dotenv
 from utils.GCSClient import GCSClient
 from time import time
@@ -7,7 +6,6 @@ import os, re
 
 
 def clean(df: pd.DataFrame):
-    
     # STANDARDIZING COLUMNS
     old_cols = df.columns
     standarized_cols = [
@@ -23,27 +21,20 @@ def clean(df: pd.DataFrame):
         'sig-str-absorbed': 'sig-str-absorbed-pm'}, 
     axis=1)
     
-    entry = df.loc[df["fighter"] == "Charles Oliveira"]
-    entry = df.iloc[entry.index].reset_index(drop=True).squeeze().to_dict()
-    
-    # Iterate thru columns
-    modified_col_dtype = {}
-    for key, val in entry.items():
-        # check if val contains alphabetical characters with regexp
-        str_regexp = r'[a-zA-Z]|\s|-|:|/'
-        str_val = str(val)
+    for col in df.columns:
+        try:
+            df.loc[:, col] = df.loc[:, col].replace('', -1).replace(np.NaN, -1)
+            df.loc[:, col] = df.loc[:, col].astype('int')
+        except ValueError:
+            try:
+                df.loc[:, col] = df.loc[:, col].replace(-1, '')
+                df.loc[:, col] = df.loc[:, col].replace('', -1.0)
+                df.loc[:, col] = df.loc[:, col].astype('float')
+            except Exception as e:
+                df.loc[:, col] = df.loc[:, col].replace(-1.0, '').replace(-1, '')
+                df.loc[:, col] = df.loc[:, col].replace('', '-')
+                df.loc[:, col] = df.loc[:, col].astype('str')
 
-        if re.search(str_regexp, str_val):
-            df.loc[:, key] = df.loc[:, key].replace('', '-').replace(np.NaN, '-')
-            modified_col_dtype[key] = 'string'
-        elif '.' in str_val:
-            df.loc[:, key] = df.loc[:, key].replace('', -1.0).replace(np.NaN, -1)
-            modified_col_dtype[key] = 'float'
-        else:
-            df.loc[:, key] = df.loc[:, key].replace('', -1).replace(np.NaN, -1)
-            modified_col_dtype[key] = 'int'
-
-    df = df.astype(modified_col_dtype)
 
     # FILLING NA VALUES IN OBJECT OR STR COLUMNS WITH EMPTY STR
     cols = ['wins', 'losses', 'draws']
