@@ -2,7 +2,7 @@ from dotenv import load_dotenv, find_dotenv
 from ufc_proj.common.utils.GCSClient import GCSClient
 from time import time
 import pandas as pd, numpy as np
-import os, re
+import os
 
 
 def clean(df: pd.DataFrame):
