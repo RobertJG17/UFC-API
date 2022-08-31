@@ -23,11 +23,10 @@ def clean(df: pd.DataFrame):
     # DYNAMIC CAST USING NESTED TRY EXCEPT BLOCKS
     for col in df.columns:
         try:
-            df.loc[:, col] = df.loc[:, col].replace(-1, '')
             df.loc[:, col] = df.loc[:, col].replace('', -1.0)
             df.loc[:, col] = df.loc[:, col].astype('float')
         except ValueError:
-            df.loc[:, col] = df.loc[:, col].replace(-1.0, '').replace(-1, '')
+            df.loc[:, col] = df.loc[:, col].replace(-1.0, '')
             df.loc[:, col] = df.loc[:, col].replace('', '-')
             df.loc[:, col] = df.loc[:, col].astype('str')
 
