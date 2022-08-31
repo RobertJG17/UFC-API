@@ -1,7 +1,7 @@
-from ufc_proj.common.utils.parsers import parse_soup
+from utils.parsers import parse_soup
 from aiohttp import ClientSession, TCPConnector
 from dotenv import load_dotenv, find_dotenv
-from ufc_proj.common.utils.GCSClient import GCSClient
+from utils.GCSClient import GCSClient
 from bs4 import BeautifulSoup
 from time import time
 import pandas as pd
@@ -35,7 +35,6 @@ async def main():
      gcs_fighters_client = GCSClient(blob_path=fighters_blob_path)
      fighters_blob = gcs_fighters_client.fetch_from_bucket()
      fighters_df = gcs_fighters_client.create_df_from_blob(fighters_blob)
-     fighters_df['slug'] = fighters_df['name'].apply(lambda n: n.lower().replace(' ','-'))
 
      async with ClientSession(connector=TCPConnector(ssl=False)) as session:
           for idx in fighters_df.index:
@@ -74,9 +73,9 @@ def stats_entrypoint():
      print('Script took {} seconds to complete'.format(end-start))
     
 
-# if __name__ == "__main__":
-#      # LOAD .ENV TO ACCESS SENSITIVE DATA
-#      load_dotenv(find_dotenv())
+if __name__ == "__main__":
+     # LOAD .ENV TO ACCESS SENSITIVE DATA
+     load_dotenv(find_dotenv())
 
-#      # RUN SCRIPT
-#      stats_entrypoint()
+     # RUN SCRIPT
+     stats_entrypoint()

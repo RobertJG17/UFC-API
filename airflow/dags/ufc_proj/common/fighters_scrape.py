@@ -1,7 +1,7 @@
-from ufc_proj.common.utils.parsers import extract_info
+from utils.parsers import extract_info
 from aiohttp import ClientSession, TCPConnector
 from dotenv import load_dotenv, find_dotenv
-from ufc_proj.common.utils.GCSClient import GCSClient
+from utils.GCSClient import GCSClient
 from bs4 import BeautifulSoup
 from itertools import chain
 from time import time
@@ -53,6 +53,15 @@ async def main():
         return records   
 
 
+# HELPER METHOD TO HANDLE DUPES AND ADD NEW COL
+def modify(df: pd.DataFrame):
+    df['slug'] = df['name'].apply(lambda n: n.lower().replace(' ','-'))
+    dup_idx = df[(df['slug'] == 'bruno-silva') & (df['nick-name'] == 'Blindado')].index
+    df.loc[dup_idx, 'slug'] = df.loc[dup_idx, 'slug'] + '-' + df.loc[dup_idx, 'nick-name']
+    df.loc[dup_idx, 'slug'] = df.loc[dup_idx, 'slug'].apply(lambda s: s.lower())
+    df = df.drop_duplicates(subset='slug', keep='last', ignore_index=True)
+    return df
+
 
 # ENTRY POINT FOR DAG REFERENCE
 def fighters_entrypoint():
@@ -65,8 +74,8 @@ def fighters_entrypoint():
     # using chain.from_iterables
     # snippet pulled from: https://www.geeksforgeeks.org/python-ways-to-flatten-a-2d-list/
     records = list(chain.from_iterable(pages))
-
     df = pd.DataFrame.from_records(records)
+    df = modify(df)
     parquet_file = df.to_parquet(engine='pyarrow')
     
     # method call
@@ -78,9 +87,9 @@ def fighters_entrypoint():
     print('Script took {} seconds to complete'.format(end-start))
 
 
-# if __name__ == "__main__":
-#     # LOAD .ENV TO ACCESS SENSITIVE DATA
-#     load_dotenv(find_dotenv())
+if __name__ == "__main__":
+    # LOAD .ENV TO ACCESS SENSITIVE DATA
+    load_dotenv(find_dotenv())
 
-#     # RUN SCRIPT
-#     fighters_entrypoint()
+    # RUN SCRIPT
+    fighters_entrypoint()

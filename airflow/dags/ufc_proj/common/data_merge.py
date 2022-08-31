@@ -1,5 +1,6 @@
+from multiprocessing.sharedctypes import Value
 from dotenv import load_dotenv, find_dotenv
-from ufc_proj.common.utils.GCSClient import GCSClient
+from utils.GCSClient import GCSClient
 from time import time
 import pandas as pd, numpy as np
 import os
@@ -25,6 +26,8 @@ def clean(df: pd.DataFrame):
     for col in df.columns:
         try:
             df.loc[:, col] = df.loc[:, col].replace('', -1).replace(np.NaN, -1)
+            if df.loc[:, col].apply(lambda val: int(val)) != df.loc[:, col]:
+                raise ValueError
             df.loc[:, col] = df.loc[:, col].astype('int')
         except ValueError:
             try:
@@ -67,7 +70,7 @@ def data_merge_entrypoint():
     stats_df = gcs_stats_client.create_df_from_blob(stats_blob)
 
     # MERGE DF | CLEAN DF | WRITE TO PARQUET FILE
-    merged = fighters_df.merge(stats_df, left_on="name", right_on="Fighter")
+    merged = fighters_df.merge(stats_df, on="slug", )
     curated = clean(merged)
     curated_file = curated.to_parquet()
 

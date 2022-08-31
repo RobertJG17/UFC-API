@@ -44,7 +44,7 @@ def parse_soup(soup, fighter, slug):
     wins = extract(wins_tags, 'c-stat-3bar__label', 'c-stat-3bar__value', 'wins')
     meta = extract(meta_tags, 'c-bio__label', 'c-bio__text')
 
-    return_obj = {'Fighter':fighter, 'fighter-slug':slug}
+    return_obj = {'slug':slug}
 
     for obj in [records, accuracy, stats, wins, meta]:
         if obj is not None:
