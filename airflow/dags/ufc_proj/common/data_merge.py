@@ -16,11 +16,9 @@ def clean(df: pd.DataFrame):
     new_col_dict = {old_cols[idx]: standarized_cols[idx] for idx in range(len(df.columns))}
 
     # APPENDING PM TO METRICS MEASURED PER MINUTE
+    pm_cols = {'sig-str-landed': 'sig-str-landed-pm', 'sig-str-absorbed': 'sig-str-absorbed-pm'}
     df = df.rename(new_col_dict, axis=1)
-    df = df.rename({
-        'sig-str-landed': 'sig-str-landed-pm', 
-        'sig-str-absorbed': 'sig-str-absorbed-pm'}, 
-    axis=1)
+    df = df.rename(pm_cols, axis=1)
 
     # DYNAMIC CAST USING NESTED TRY EXCEPT BLOCKS
     for col in df.columns:
