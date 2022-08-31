@@ -21,30 +21,27 @@ def clean(df: pd.DataFrame):
         'sig-str-landed': 'sig-str-landed-pm', 
         'sig-str-absorbed': 'sig-str-absorbed-pm'}, 
     axis=1)
-    
+
     # DYNAMIC CAST USING NESTED TRY EXCEPT BLOCKS
     for col in df.columns:
         try:
-            df.loc[:, col] = df.loc[:, col].replace('', -1).replace(np.NaN, -1)
-            if df.loc[:, col].apply(lambda val: int(val)) != df.loc[:, col]:
-                raise ValueError
-            df.loc[:, col] = df.loc[:, col].astype('int')
+            df.loc[:, col] = df.loc[:, col].replace(-1, '')
+            df.loc[:, col] = df.loc[:, col].replace('', -1.0)
+            df.loc[:, col] = df.loc[:, col].astype('float')
         except ValueError:
-            try:
-                df.loc[:, col] = df.loc[:, col].replace(-1, '')
-                df.loc[:, col] = df.loc[:, col].replace('', -1.0)
-                df.loc[:, col] = df.loc[:, col].astype('float')
-            except ValueError:
-                df.loc[:, col] = df.loc[:, col].replace(-1.0, '').replace(-1, '')
-                df.loc[:, col] = df.loc[:, col].replace('', '-')
-                df.loc[:, col] = df.loc[:, col].astype('str')
+            df.loc[:, col] = df.loc[:, col].replace(-1.0, '').replace(-1, '')
+            df.loc[:, col] = df.loc[:, col].replace('', '-')
+            df.loc[:, col] = df.loc[:, col].astype('str')
 
+    df = df.convert_dtypes()
 
     # FILLING NA VALUES IN OBJECT OR STR COLUMNS WITH EMPTY STR
     cols = ['wins', 'losses', 'draws']
     for idx in range(len(cols)):
         df.loc[:, cols[idx]] = df['record'].apply(lambda rec: rec.split(' ')[0].split('-')[idx])
         df.loc[:, cols[idx]] = df.loc[:, cols[idx]].astype(int)
+
+    df = df.drop('record', axis=1)
 
     return df[sorted(df.columns)]
 
