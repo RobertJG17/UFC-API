@@ -20,7 +20,7 @@ def clean(df: pd.DataFrame):
     df = df.rename(new_col_dict, axis=1)
     df = df.rename(pm_cols, axis=1)
 
-    # DYNAMIC CAST USING NESTED TRY EXCEPT BLOCKS
+    # DYNAMIC CAST USING TRY EXCEPT BLOCKS
     for col in df.columns:
         try:
             df.loc[:, col] = df.loc[:, col].replace('', -1.0)
@@ -30,6 +30,7 @@ def clean(df: pd.DataFrame):
             df.loc[:, col] = df.loc[:, col].replace('', '-')
             df.loc[:, col] = df.loc[:, col].astype('str')
 
+    # USES BUILT IN CAST METHOD TO CONVERT FLOAT COLS TO INT COLS
     df = df.convert_dtypes()
 
     # FILLING NA VALUES IN OBJECT OR STR COLUMNS WITH EMPTY STR
