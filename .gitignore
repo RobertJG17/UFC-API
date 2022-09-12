@@ -8,4 +8,5 @@ env
 logs
 plugins
 parsers
-
+pgconfig.py
+sql_migration.py
