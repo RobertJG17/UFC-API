@@ -23,7 +23,7 @@ def clean(df: pd.DataFrame):
     # DYNAMIC CAST USING TRY EXCEPT BLOCKS
     for col in df.columns:
         try:
-            df.loc[:, col] = df.loc[:, col].replace('', -1.0)
+            df.loc[:, col] = df.loc[:, col].replace('', -1.0).replace('None', -1.0).replace(pd.NA, -1.0).replace(np.NaN, -1.0)
             df.loc[:, col] = df.loc[:, col].astype('float')
         except ValueError:
             df.loc[:, col] = df.loc[:, col].replace(-1.0, '')
@@ -65,14 +65,20 @@ def data_merge_entrypoint():
     stats_df = gcs_stats_client.create_df_from_blob(stats_blob)
 
     # MERGE DF | CLEAN DF | WRITE TO PARQUET FILE
-    merged = fighters_df.merge(stats_df, on="slug", )
+    merged = fighters_df.merge(stats_df, on="slug")
     curated = clean(merged)
     curated_file = curated.to_parquet()
+    curated_csv_file = curated.to_csv()
 
     # UPLOAD CLEANED FILE TO GCS BUCKET
     curated_blob_path = os.environ.get('MERGE_GCS_PATH')
     gcs_curated_client = GCSClient(blob_path=curated_blob_path)
     gcs_curated_client.upload_to_bucket(curated_file)
+
+    curated_blob_path_csv = os.environ.get('MERGE_GCS_PATH_CSV')
+    gcs_curated_csv_client = GCSClient(blob_path=curated_blob_path_csv)
+    gcs_curated_csv_client.upload_to_bucket(curated_csv_file)
+
 
     end = time()
     print(f"Script took {end - start} seconds to complete")

@@ -35,6 +35,7 @@ class GCSClient:
     def create_df_from_blob(self, blob):
         f = BytesIO()
         blob.download_to_file(f)
-        df = pd.read_parquet(f)
+        df = pd.read_parquet(f, engine="pyarrow")
+        f.close()
         print('DF CREATED SUCCESSFULLY')
         return df
