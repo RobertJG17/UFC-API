@@ -23,7 +23,8 @@ def clean(df: pd.DataFrame):
     # DYNAMIC CAST USING TRY EXCEPT BLOCKS
     for col in df.columns:
         try:
-            df.loc[:, col] = df.loc[:, col].replace('', -1.0).replace('None', -1.0).replace(pd.NA, -1.0).replace(np.NaN, -1.0)
+            null_mapping = {key: -1.0 for key in ['', 'None', pd.NA, np.NaN]}
+            df.loc[:, col] = df.loc[:, col].replace(null_mapping)
             df.loc[:, col] = df.loc[:, col].astype('float')
         except ValueError:
             df.loc[:, col] = df.loc[:, col].replace(-1.0, '')
